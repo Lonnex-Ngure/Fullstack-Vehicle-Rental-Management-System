@@ -1,0 +1,798 @@
+<!-- import React, { useState} from 'react';
+import { useDispatch } from 'react-redux';
+import { logout } from '../slices/authslice';
+import { useNavigate } from 'react-router-dom';
+import {vehicleApiSlice} from '../services/vehicleApiSlice'
+
+const AdminDashboard: React.FC = () => {
+  const [activeSection, setActiveSection] = useState('Dashboard');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { data: vehicles, error, isLoading } = vehicleApiSlice.useFetchVehiclesQuery({});
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/');
+  };
+
+  const renderActiveSection = () => {
+    switch (activeSection) {
+      case 'Dashboard':
+        return (
+          <>
+            <header className="mb-8">
+              <h1 className="text-3xl font-bold">Overview</h1>
+            </header>
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+                <h2 className="text-xl font-bold">Total Bookings</h2>
+                <p className="text-2xl">1,234</p>
+              </div>
+              <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+                <h2 className="text-xl font-bold">Revenue</h2>
+                <p className="text-2xl">$567,890</p>
+              </div>
+              <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+                <h2 className="text-xl font-bold">Active Rentals</h2>
+                <p className="text-2xl">123</p>
+              </div>
+            </section>
+            <section className="mb-8">
+              <div className="flex space-x-4 mb-4">
+                <button className="bg-red-600 py-2 px-4 rounded">Add Vehicle</button>
+                <button className="bg-red-600 py-2 px-4 rounded">Manage Users</button>
+                <button className="bg-red-600 py-2 px-4 rounded">View Reports</button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+                  <h2 className="text-xl font-bold">Recent Bookings</h2>
+                  {/* Content for Recent Bookings */}
+                </div>
+                <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+                  <h2 className="text-xl font-bold">Revenue Chart</h2>
+                  {/* Content for Revenue Chart */}
+                </div>
+                <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+                  <h2 className="text-xl font-bold">Vehicle Utilization Chart</h2>
+                  {/* Content for Vehicle Utilization Chart */}
+                </div>
+                <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+                  <h2 className="text-xl font-bold">Fleet Status Summary</h2>
+                  {/* Content for Fleet Status Summary */}
+                </div>
+              </div>
+            </section>
+          </>
+        );
+        case 'Manage Vehicles':
+          return (
+            <div>
+              <h1 className="text-3xl font-bold mb-4">Manage Vehicles</h1>
+              {isLoading ? (
+                <p>Loading vehicles...</p>
+              ) : error ? (
+                <p>Error loading vehicles: {error.toString()}</p>
+              ) : (
+                <>
+                  <table className="w-full bg-gray-900 rounded-lg overflow-hidden">
+                    <thead>
+                      <tr className="bg-gray-800">
+                        <th className="px-4 py-2">Vehicle ID</th>
+                        <th className="px-4 py-2">Manufacturer</th>
+                        <th className="px-4 py-2">Model</th>
+                        <th className="px-4 py-2">Year</th>
+                        <th className="px-4 py-2">Rental Rate</th>
+                        <th className="px-4 py-2">Availability</th>
+                        <th className="px-4 py-2">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {vehicles?.map((vehicle) => (
+                        <tr key={vehicle.vehicleId} className="border-t border-gray-800">
+                          <td className="px-4 py-2">{vehicle.vehicleId}</td>
+                          <td className="px-4 py-2">{vehicle.specification.manufacturer}</td>
+                          <td className="px-4 py-2">{vehicle.specification.model}</td>
+                          <td className="px-4 py-2">{vehicle.specification.year}</td>
+                          <td className="px-4 py-2">${vehicle.rentalRate}</td>
+                          <td className="px-4 py-2">{vehicle.availability ? 'Available' : 'Unavailable'}</td>
+                          <td className="px-4 py-2">
+                            <button className="bg-blue-600 text-white px-2 py-1 rounded mr-2" onClick={() => handleEdit(vehicle.vehicleId)}>
+                              Edit
+                            </button>
+                            <button className="bg-red-600 text-white px-2 py-1 rounded" onClick={() => handleDelete(vehicle.vehicleId)}>
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <button className="bg-red-600 text-white px-4 py-2 rounded mt-4" onClick={handleAddNewVehicle}>
+                    Add New Vehicle
+                  </button>
+                </>
+              )}
+            </div>
+          );
+      case 'Manage Users':
+        return (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">Manage Users</h1>
+            {/* Add user management content here */}
+          </div>
+        );
+      case 'Reports':
+        return (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">Reports</h1>
+            {/* Add reports content here */}
+          </div>
+        );
+      case 'Locations and Branches':
+        return (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">Locations and Branches</h1>
+            {/* Add locations and branches content here */}
+          </div>
+        );
+      case 'Customer Support Tickets':
+        return (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">Customer Support Tickets</h1>
+            {/* Add customer support tickets content here */}
+          </div>
+        );
+      case 'Fleet Management':
+        return (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">Fleet Management</h1>
+            {/* Add fleet management content here */}
+          </div>
+        );
+      case 'Settings':
+        return (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">Settings</h1>
+            {/* Add settings content here */}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const handleEdit = (id: string) => {
+    // Implement edit functionality
+    console.log(`Edit vehicle with id: ${id}`);
+  };
+
+  const handleDelete = (id: string) => {
+    // Implement delete functionality
+    console.log(`Delete vehicle with id: ${id}`);
+  };
+
+  const handleAddNewVehicle = () => {
+    // Implement add new vehicle functionality
+    console.log('Add new vehicle');
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      <div className="w-64 bg-gray-900 text-white p-4">
+        <h2 className="text-2xl font-bold mb-6">Admin Dashboard</h2>
+        <nav>
+          <ul>
+            {['Dashboard', 'Manage Vehicles', 'Manage Users', 'Reports', 'Locations and Branches', 'Customer Support Tickets', 'Fleet Management', 'Settings'].map((item) => (
+              <li key={item} className="mb-2">
+                <button
+                  onClick={() => setActiveSection(item)}
+                  className={`w-full text-left py-2 px-4 rounded ${
+                    activeSection === item ? 'bg-red-600' : 'hover:bg-gray-800'
+                  }`}
+                >
+                  {item}
+                </button>
+              </li>
+            ))}
+            <li>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left py-2 px-4 rounded hover:bg-gray-800"
+              >
+                Logout
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <main className="flex-1 bg-gray-800 text-white p-8">
+        {renderActiveSection()}
+      </main>
+    </div>
+  );
+};
+
+export default AdminDashboard; -->
+
+
+// import React, { useState} from 'react';
+// import { useDispatch } from 'react-redux';
+// import { logout } from '../slices/authslice';
+// import { useNavigate } from 'react-router-dom';
+// import {vehicleApiSlice} from '../services/vehicleApiSlice'
+
+// const AdminDashboard: React.FC = () => {
+//   const [activeSection, setActiveSection] = useState('Dashboard');
+//   const [editingVehicleId, setEditingVehicleId] = useState<string | null>(null);
+//   const [newVehicle, setNewVehicle] = useState({
+//     manufacturer: '',
+//     model: '',
+//     year: '',
+//     rentalRate: '',
+//     availability: true,
+//   });
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+
+//   const { data: vehicles, error, isLoading } = vehicleApiSlice.useFetchVehiclesQuery({});
+//   const [addVehicle] = vehicleApiSlice.useAddVehicleMutation();
+//   const [updateVehicle] = vehicleApiSlice.useUpdateVehicleMutation();
+//   const [deleteVehicle] = vehicleApiSlice.useDeleteVehicleMutation();
+
+//   const handleLogout = () => {
+//     dispatch(logout());
+//     navigate('/');
+//   };
+
+//   const handleEdit = (id: string) => {
+//     setEditingVehicleId(id);
+//   };
+
+//   const handleCancelEdit = () => {
+//     setEditingVehicleId(null);
+//   };
+
+//   const handleSaveEdit = async (vehicle: any) => {
+//     try {
+//       await updateVehicle({ id: vehicle.vehicleId, ...vehicle }).unwrap();
+//       setEditingVehicleId(null);
+//     } catch (err) {
+//       console.error('Failed to update vehicle:', err);
+//     }
+//   };
+
+//   const handleDelete = async (id: string) => {
+//     try {
+//       await deleteVehicle(id).unwrap();
+//     } catch (err) {
+//       console.error('Failed to delete vehicle:', err);
+//     }
+//   };
+
+//   const handleAddNewVehicle = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     try {
+//       await addVehicle(newVehicle).unwrap();
+//       setNewVehicle({
+//         manufacturer: '',
+//         model: '',
+//         year: '',
+//         rentalRate: '',
+//         availability: true,
+//       });
+//     } catch (err) {
+//       console.error('Failed to add new vehicle:', err);
+//     }
+//   };
+
+//   const handleNewVehicleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value, type, checked } = e.target;
+//     setNewVehicle(prev => ({
+//       ...prev,
+//       [name]: type === 'checkbox' ? checked : value,
+//     }));
+//   };
+//   const renderActiveSection = () => {
+//     switch (activeSection) {
+//       case 'Dashboard':
+//         return (
+//           <>
+//             <header className="mb-8">
+//               <h1 className="text-3xl font-bold">Overview</h1>
+//             </header>
+//             <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+//               <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+//                 <h2 className="text-xl font-bold">Total Bookings</h2>
+//                 <p className="text-2xl">1,234</p>
+//               </div>
+//               <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+//                 <h2 className="text-xl font-bold">Revenue</h2>
+//                 <p className="text-2xl">$567,890</p>
+//               </div>
+//               <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+//                 <h2 className="text-xl font-bold">Active Rentals</h2>
+//                 <p className="text-2xl">123</p>
+//               </div>
+//             </section>
+//             <section className="mb-8">
+//               <div className="flex space-x-4 mb-4">
+//                 <button className="bg-red-600 py-2 px-4 rounded">Add Vehicle</button>
+//                 <button className="bg-red-600 py-2 px-4 rounded">Manage Users</button>
+//                 <button className="bg-red-600 py-2 px-4 rounded">View Reports</button>
+//               </div>
+//               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//                 <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+//                   <h2 className="text-xl font-bold">Recent Bookings</h2>
+//                   {/* Content for Recent Bookings */}
+//                 </div>
+//                 <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+//                   <h2 className="text-xl font-bold">Revenue Chart</h2>
+//                   {/* Content for Revenue Chart */}
+//                 </div>
+//                 <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+//                   <h2 className="text-xl font-bold">Vehicle Utilization Chart</h2>
+//                   {/* Content for Vehicle Utilization Chart */}
+//                 </div>
+//                 <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+//                   <h2 className="text-xl font-bold">Fleet Status Summary</h2>
+//                   {/* Content for Fleet Status Summary */}
+//                 </div>
+//               </div>
+//             </section>
+//           </>
+//         );
+//         case 'Manage Vehicles':
+//           return (
+//             <div>
+//               <h1 className="text-3xl font-bold mb-4">Manage Vehicles</h1>
+//               {isLoading ? (
+//                 <p>Loading vehicles...</p>
+//               ) : error ? (
+//                 <p>Error loading vehicles: {error.toString()}</p>
+//               ) : (
+//                 <>
+//                   <table className="w-full bg-gray-900 rounded-lg overflow-hidden mb-4">
+//                     <thead>
+//                       <tr className="bg-gray-800">
+//                         <th className="px-4 py-2">Vehicle ID</th>
+//                         <th className="px-4 py-2">Manufacturer</th>
+//                         <th className="px-4 py-2">Model</th>
+//                         <th className="px-4 py-2">Year</th>
+//                         <th className="px-4 py-2">Rental Rate</th>
+//                         <th className="px-4 py-2">Availability</th>
+//                         <th className="px-4 py-2">Actions</th>
+//                       </tr>
+//                     </thead>
+//                     <tbody>
+//                       {vehicles?.map((vehicle) => (
+//                         <tr key={vehicle.vehicleId} className="border-t border-gray-800">
+//                           {editingVehicleId === vehicle.vehicleId ? (
+//                             <>
+//                               <td className="px-4 py-2">{vehicle.vehicleId}</td>
+//                               <td className="px-4 py-2">
+//                                 <input
+//                                   type="text"
+//                                   defaultValue={vehicle.specification.manufacturer}
+//                                   onChange={(e) => vehicle.specification.manufacturer = e.target.value}
+//                                   className="bg-gray-700 px-2 py-1 rounded"
+//                                 />
+//                               </td>
+//                               <td className="px-4 py-2">
+//                                 <input
+//                                   type="text"
+//                                   defaultValue={vehicle.specification.model}
+//                                   onChange={(e) => vehicle.specification.model = e.target.value}
+//                                   className="bg-gray-700 px-2 py-1 rounded"
+//                                 />
+//                               </td>
+//                               <td className="px-4 py-2">
+//                                 <input
+//                                   type="text"
+//                                   defaultValue={vehicle.specification.year}
+//                                   onChange={(e) => vehicle.specification.year = e.target.value}
+//                                   className="bg-gray-700 px-2 py-1 rounded"
+//                                 />
+//                               </td>
+//                               <td className="px-4 py-2">
+//                                 <input
+//                                   type="number"
+//                                   defaultValue={vehicle.rentalRate}
+//                                   onChange={(e) => vehicle.rentalRate = parseFloat(e.target.value)}
+//                                   className="bg-gray-700 px-2 py-1 rounded"
+//                                 />
+//                               </td>
+//                               <td className="px-4 py-2">
+//                                 <input
+//                                   type="checkbox"
+//                                   defaultChecked={vehicle.availability}
+//                                   onChange={(e) => vehicle.availability = e.target.checked}
+//                                   className="bg-gray-700 px-2 py-1 rounded"
+//                                 />
+//                               </td>
+//                               <td className="px-4 py-2">
+//                                 <button className="bg-green-600 text-white px-2 py-1 rounded mr-2" onClick={() => handleSaveEdit(vehicle)}>
+//                                   Save
+//                                 </button>
+//                                 <button className="bg-gray-600 text-white px-2 py-1 rounded" onClick={handleCancelEdit}>
+//                                   Cancel
+//                                 </button>
+//                               </td>
+//                             </>
+//                           ) : (
+//                             <>
+//                               <td className="px-4 py-2">{vehicle.vehicleId}</td>
+//                               <td className="px-4 py-2">{vehicle.specification.manufacturer}</td>
+//                               <td className="px-4 py-2">{vehicle.specification.model}</td>
+//                               <td className="px-4 py-2">{vehicle.specification.year}</td>
+//                               <td className="px-4 py-2">${vehicle.rentalRate}</td>
+//                               <td className="px-4 py-2">{vehicle.availability ? 'Available' : 'Unavailable'}</td>
+//                               <td className="px-4 py-2">
+//                                 <button className="bg-blue-600 text-white px-2 py-1 rounded mr-2" onClick={() => handleEdit(vehicle.vehicleId)}>
+//                                   Edit
+//                                 </button>
+//                                 <button className="bg-red-600 text-white px-2 py-1 rounded" onClick={() => handleDelete(vehicle.vehicleId)}>
+//                                   Delete
+//                                 </button>
+//                               </td>
+//                             </>
+//                           )}
+//                         </tr>
+//                       ))}
+//                     </tbody>
+//                   </table>
+//                   <form onSubmit={handleAddNewVehicle} className="bg-gray-900 p-4 rounded-lg">
+//                     <h2 className="text-xl font-bold mb-4">Add New Vehicle</h2>
+//                     <div className="grid grid-cols-2 gap-4">
+//                       <input
+//                         type="text"
+//                         name="manufacturer"
+//                         value={newVehicle.manufacturer}
+//                         onChange={handleNewVehicleChange}
+//                         placeholder="Manufacturer"
+//                         className="bg-gray-700 px-2 py-1 rounded"
+//                         required
+//                       />
+//                       <input
+//                         type="text"
+//                         name="model"
+//                         value={newVehicle.model}
+//                         onChange={handleNewVehicleChange}
+//                         placeholder="Model"
+//                         className="bg-gray-700 px-2 py-1 rounded"
+//                         required
+//                       />
+//                       <input
+//                         type="text"
+//                         name="year"
+//                         value={newVehicle.year}
+//                         onChange={handleNewVehicleChange}
+//                         placeholder="Year"
+//                         className="bg-gray-700 px-2 py-1 rounded"
+//                         required
+//                       />
+//                       <input
+//                         type="number"
+//                         name="rentalRate"
+//                         value={newVehicle.rentalRate}
+//                         onChange={handleNewVehicleChange}
+//                         placeholder="Rental Rate"
+//                         className="bg-gray-700 px-2 py-1 rounded"
+//                         required
+//                       />
+//                       <div>
+//                         <label className="flex items-center">
+//                           <input
+//                             type="checkbox"
+//                             name="availability"
+//                             checked={newVehicle.availability}
+//                             onChange={handleNewVehicleChange}
+//                             className="mr-2"
+//                           />
+//                           Available
+//                         </label>
+//                       </div>
+//                     </div>
+//                     <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded mt-4">
+//                       Add Vehicle
+//                     </button>
+//                   </form>
+//                 </>
+//               )}
+//             </div>
+//           );
+//       case 'Manage Users':
+//         return (
+//           <div>
+//             <h1 className="text-3xl font-bold mb-4">Manage Users</h1>
+//             {/* Add user management content here */}
+//           </div>
+//         );
+//       case 'Reports':
+//         return (
+//           <div>
+//             <h1 className="text-3xl font-bold mb-4">Reports</h1>
+//             {/* Add reports content here */}
+//           </div>
+//         );
+//       case 'Locations and Branches':
+//         return (
+//           <div>
+//             <h1 className="text-3xl font-bold mb-4">Locations and Branches</h1>
+//             {/* Add locations and branches content here */}
+//           </div>
+//         );
+//       case 'Customer Support Tickets':
+//         return (
+//           <div>
+//             <h1 className="text-3xl font-bold mb-4">Customer Support Tickets</h1>
+//             {/* Add customer support tickets content here */}
+//           </div>
+//         );
+//       case 'Fleet Management':
+//         return (
+//           <div>
+//             <h1 className="text-3xl font-bold mb-4">Fleet Management</h1>
+//             {/* Add fleet management content here */}
+//           </div>
+//         );
+//       case 'Settings':
+//         return (
+//           <div>
+//             <h1 className="text-3xl font-bold mb-4">Settings</h1>
+//             {/* Add settings content here */}
+//           </div>
+//         );
+//       default:
+//         return null;
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen flex">
+//       <div className="w-64 bg-gray-900 text-white p-4">
+//         <h2 className="text-2xl font-bold mb-6">Admin Dashboard</h2>
+//         <nav>
+//           <ul>
+//             {['Dashboard', 'Manage Vehicles', 'Manage Users', 'Reports', 'Locations and Branches', 'Customer Support Tickets', 'Fleet Management', 'Settings'].map((item) => (
+//               <li key={item} className="mb-2">
+//                 <button
+//                   onClick={() => setActiveSection(item)}
+//                   className={`w-full text-left py-2 px-4 rounded ${
+//                     activeSection === item ? 'bg-red-600' : 'hover:bg-gray-800'
+//                   }`}
+//                 >
+//                   {item}
+//                 </button>
+//               </li>
+//             ))}
+//             <li>
+//               <button
+//                 onClick={handleLogout}
+//                 className="w-full text-left py-2 px-4 rounded hover:bg-gray-800"
+//               >
+//                 Logout
+//               </button>
+//             </li>
+//           </ul>
+//         </nav>
+//       </div>
+//       <main className="flex-1 bg-gray-800 text-white p-8">
+//         {renderActiveSection()}
+//       </main>
+//     </div>
+//   );
+// };
+
+// export default AdminDashboard;
+
+
+
+// In the AdminDashboard component:
+
+const handleUpdateFleetItem = async () => {
+  if (editingFleetItem) {
+    try {
+      const updatedItem = {
+        fleetId: editingFleetItem.fleetId,
+        vehicleId: editingFleetItem.vehicle.vehicleId,
+        acquisitionDate: editingFleetItem.acquisitionDate,
+        depreciationRate: editingFleetItem.depreciationRate,
+        currentValue: editingFleetItem.currentValue,
+        maintenanceCost: editingFleetItem.maintenanceCost,
+        status: editingFleetItem.status
+      };
+      await updateFleetItem(updatedItem).unwrap();
+      setEditingFleetItem(null);
+      refetchFleet();
+    } catch (err) {
+      console.error('Failed to update fleet item:', err);
+    }
+  }
+};
+
+// In the renderActiveSection function, update the Fleet Management case:
+
+case 'Fleet Management':
+  return (
+    <div>
+      <h1 className="text-3xl font-bold mb-4">Fleet Management</h1>
+      {isFleetLoading ? (
+        <p>Loading fleet management data...</p>
+      ) : fleetError ? (
+        <p>Error loading fleet management data: {fleetError.toString()}</p>
+      ) : (
+        <>
+          {/* Keep the existing summary section */}
+          <table className="w-full bg-gray-900 rounded-lg overflow-hidden mb-4">
+            <thead>
+              <tr className="bg-gray-800">
+                <th className="px-4 py-2">Fleet ID</th>
+                <th className="px-4 py-2">Vehicle ID</th>
+                <th className="px-4 py-2">Acquisition Date</th>
+                <th className="px-4 py-2">Depreciation Rate</th>
+                <th className="px-4 py-2">Current Value</th>
+                <th className="px-4 py-2">Maintenance Cost</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fleetManagement?.map((item: FleetManagementItem) => (
+                <tr key={item.fleetId} className="border-t border-gray-800">
+                  <td className="px-4 py-2">{item.fleetId}</td>
+                  <td className="px-4 py-2">
+                    {editingFleetItem?.fleetId === item.fleetId ? (
+                      <input
+                        className="bg-gray-700 px-2 py-1 rounded"
+                        type="number"
+                        value={editingFleetItem.vehicle.vehicleId}
+                        onChange={(e) => setEditingFleetItem({
+                          ...editingFleetItem,
+                          vehicle: { ...editingFleetItem.vehicle, vehicleId: parseInt(e.target.value) }
+                        })}
+                      />
+                    ) : (
+                      item.vehicle.vehicleId
+                    )}
+                  </td>
+                  <td className="px-4 py-2">
+                    {editingFleetItem?.fleetId === item.fleetId ? (
+                      <input
+                        className="bg-gray-700 px-2 py-1 rounded"
+                        type="date"
+                        value={editingFleetItem.acquisitionDate.split('T')[0]}
+                        onChange={(e) => setEditingFleetItem({ ...editingFleetItem, acquisitionDate: e.target.value })}
+                      />
+                    ) : (
+                      new Date(item.acquisitionDate).toLocaleDateString()
+                    )}
+                  </td>
+                  <td className="px-4 py-2">
+                    {editingFleetItem?.fleetId === item.fleetId ? (
+                      <input
+                        className="bg-gray-700 px-2 py-1 rounded"
+                        type="number"
+                        value={editingFleetItem.depreciationRate}
+                        onChange={(e) => setEditingFleetItem({ ...editingFleetItem, depreciationRate: parseFloat(e.target.value) })}
+                      />
+                    ) : (
+                      item.depreciationRate
+                    )}
+                  </td>
+                  {/* Add similar editable fields for currentValue and maintenanceCost */}
+                  <td className="px-4 py-2">
+                    {editingFleetItem?.fleetId === item.fleetId ? (
+                      <select
+                        className="bg-gray-700 px-2 py-1 rounded"
+                        value={editingFleetItem.status}
+                        onChange={(e) => setEditingFleetItem({ ...editingFleetItem, status: e.target.value })}
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Under Maintenance">Under Maintenance</option>
+                        <option value="Out of Service">Out of Service</option>
+                      </select>
+                    ) : (
+                      item.status
+                    )}
+                  </td>
+                  <td className="px-4 py-2">
+                    {editingFleetItem?.fleetId === item.fleetId ? (
+                      <>
+                        <button
+                          className="bg-green-600 text-white px-2 py-1 rounded mr-2"
+                          onClick={handleUpdateFleetItem}
+                        >
+                          Save
+                        </button>
+                        <button
+                          className="bg-gray-600 text-white px-2 py-1 rounded"
+                          onClick={() => setEditingFleetItem(null)}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className="bg-blue-600 text-white px-2 py-1 rounded mr-2"
+                          onClick={() => handleEditFleetItem(item)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="bg-red-600 text-white px-2 py-1 rounded"
+                          onClick={() => handleDeleteFleetItem(item.fleetId)}
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="bg-gray-900 p-4 rounded-lg">
+            <h2 className="text-xl font-bold mb-4">Add New Fleet Item</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                className="bg-gray-700 px-2 py-1 rounded"
+                type="number"
+                placeholder="Vehicle ID"
+                value={newFleetItem.vehicle?.vehicleId || ''}
+                onChange={(e) => setNewFleetItem({
+                  ...newFleetItem,
+                  vehicle: { ...newFleetItem.vehicle, vehicleId: parseInt(e.target.value) }
+                })}
+              />
+              <input
+                className="bg-gray-700 px-2 py-1 rounded"
+                type="date"
+                placeholder="Acquisition Date"
+                value={newFleetItem.acquisitionDate?.split('T')[0] || ''}
+                onChange={(e) => setNewFleetItem({ ...newFleetItem, acquisitionDate: e.target.value })}
+              />
+              <input
+                className="bg-gray-700 px-2 py-1 rounded"
+                type="number"
+                placeholder="Depreciation Rate"
+                value={newFleetItem.depreciationRate || ''}
+                onChange={(e) => setNewFleetItem({ ...newFleetItem, depreciationRate: parseFloat(e.target.value) })}
+              />
+              <input
+                className="bg-gray-700 px-2 py-1 rounded"
+                type="number"
+                placeholder="Current Value"
+                value={newFleetItem.currentValue || ''}
+                onChange={(e) => setNewFleetItem({ ...newFleetItem, currentValue: parseFloat(e.target.value) })}
+              />
+              <input
+                className="bg-gray-700 px-2 py-1 rounded"
+                type="number"
+                placeholder="Maintenance Cost"
+                value={newFleetItem.maintenanceCost || ''}
+                onChange={(e) => setNewFleetItem({ ...newFleetItem, maintenanceCost: parseFloat(e.target.value) })}
+              />
+              <select
+                className="bg-gray-700 px-2 py-1 rounded"
+                value={newFleetItem.status || ''}
+                onChange={(e) => setNewFleetItem({ ...newFleetItem, status: e.target.value })}
+              >
+                <option value="">Select Status</option>
+                <option value="Active">Active</option>
+                <option value="Under Maintenance">Under Maintenance</option>
+                <option value="Out of Service">Out of Service</option>
+              </select>
+            </div>
+            <button
+              className="bg-red-600 text-white px-4 py-2 rounded mt-4"
+              onClick={handleAddNewFleetItem}
+            >
+              Add New Fleet Item
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );

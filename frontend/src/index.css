@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes grow {
+    0% { width: 0% }
+    100% { width: 100% }
+  }
