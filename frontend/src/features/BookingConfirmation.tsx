@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react';
+import{ useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-const BookingConfirmation: React.FC = () => {
+const BookingConfirmation = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate('/user/dashboard');
-    }, 20000);
+    }, 15000);
 
     return () => clearTimeout(timer);
   }, [navigate]);

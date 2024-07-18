@@ -157,6 +157,10 @@ export const paymentService = {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount * 100, // Stripe expects amount in cents
       currency: currency,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never'
+      }
     });
     return paymentIntent.client_secret!;
   },
@@ -165,37 +169,66 @@ export const paymentService = {
     // Fetch booking details
     const booking = await db.query.BookingsTable.findFirst({
       where: (bookingsTable) => eq(bookingsTable.bookingId, bookingId),
+      with: {
+        user: true
+      }
     });
-
+  
     if (!booking) {
       throw new Error('Booking not found');
     }
-
-    // Create a PaymentIntent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: booking.totalAmount * 100, // Stripe expects amount in cents
-      currency: 'usd',
-      payment_method: paymentMethodId,
-      confirm: true,
-    });
-
-    // Update booking status
-    await db.update(BookingsTable)
-      .set({ bookingStatus: 'Confirmed' })
-      .where(eq(BookingsTable.bookingId, bookingId))
-      .execute();
-
-    // Create payment record
-    const payment: TIPayment = {
-      bookingId: bookingId,
-      amount: booking.totalAmount,
-      paymentStatus: 'Completed',
-      paymentDate: new Date(),
-      paymentMethod: 'Credit Card',
-      transactionId: paymentIntent.id,
-    };
-
-    const createdPayment = await paymentService.create(payment);
-    return createdPayment;
-  },
-};
+  
+    try {
+      // Create a Stripe Customer
+      const customer = await stripe.customers.create({
+        email: booking.user.email,
+        name: booking.user.fullName,
+        payment_method: paymentMethodId,
+      });
+  
+      // Create a PaymentIntent
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: booking.totalAmount * 100, // Stripe expects amount in cents
+        currency: 'usd',
+        customer: customer.id,
+        payment_method: paymentMethodId,
+        off_session: true,
+        confirm: true,
+      });
+  
+      if (paymentIntent.status === 'succeeded') {
+        // Update booking status
+        await db.update(BookingsTable)
+          .set({ bookingStatus: 'Confirmed' })
+          .where(eq(BookingsTable.bookingId, bookingId))
+          .execute();
+  
+        // Create payment record
+        const payment: TIPayment = {
+          bookingId: bookingId,
+          amount: booking.totalAmount,
+          paymentStatus: 'Paid',
+          paymentDate: new Date(),
+          paymentMethod: 'Credit Card',
+          transactionId: paymentIntent.id,
+        };
+  
+        const createdPayment = await db.insert(PaymentsTable)
+          .values(payment)
+          .returning()
+          .execute();
+  
+        return createdPayment[0];
+      } else {
+        throw new Error('Payment failed');
+      }
+    } catch (error) {
+      console.error('Error processing payment:', error);
+      // If an error occurs, attempt to revert the booking status
+      await db.update(BookingsTable)
+        .set({ bookingStatus: 'Pending' })
+        .where(eq(BookingsTable.bookingId, bookingId))
+        .execute();
+      throw error;
+    }
+  }};

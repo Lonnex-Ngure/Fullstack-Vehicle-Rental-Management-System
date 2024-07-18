@@ -65,15 +65,14 @@ export const createPaymentIntent = async (c: Context) => {
 export const processPayment = async (c: Context) => {
   const { bookingId, paymentMethodId } = await c.req.json();
   try {
-    const payment = await paymentService.processPayment(bookingId, paymentMethodId);
+    const payment = await paymentService.processPayment(Number(bookingId), paymentMethodId);
     return c.json(payment, 200);
   } catch (error) {
-    // Use a type guard to check if error is an instance of Error
+    console.error('Payment processing error:', error);
     if (error instanceof Error) {
       return c.json({ error: error.message }, 400);
     } else {
-      // Handle cases where error is not an instance of Error
-      return c.json({ error: 'An unknown error occurred' }, 400);
+      return c.json({ error: 'An unknown error occurred' }, 500);
     }
   }
 };

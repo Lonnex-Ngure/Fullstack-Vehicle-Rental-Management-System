@@ -21,7 +21,7 @@ interface Location {
   contactPhone: string;
 }
 
-const AdminDashboard: React.FC = () => {
+const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState('Dashboard');
   const dispatch = useDispatch();
   const navigate = useNavigate();

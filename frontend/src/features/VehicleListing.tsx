@@ -8,7 +8,7 @@ import { Vehicle } from "../types";
 import { useDispatch, useSelector } from "react-redux";
 import { setFormData, FormData } from '../slices/formSlice';
 
-const VehicleListing: React.FC = () => {
+const VehicleListing = () => {
   const dispatch = useDispatch();
   const [filters, setFilters] = useState({});
   const { data: vehicles, error, isLoading } = vehicleApiSlice.useFetchVehiclesQuery(filters);

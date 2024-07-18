@@ -7,7 +7,7 @@ import { bookingApiSlice, Booking } from '../services/bookingApiSlice';
 import apiSlice from '../services/apiSlice';
 
 
-const UserDashboard: React.FC = () => {
+const UserDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<'dashboard' | 'bookVehicle' | 'currentBookings' | 'bookingHistory' | 'profile' | 'supportTickets'>('dashboard');
@@ -20,10 +20,10 @@ const UserDashboard: React.FC = () => {
   const [updateBooking] = bookingApiSlice.useUpdateBookingMutation();
 
 
-  const pendingBookings = bookings?.filter((booking: Booking) => 
-    booking.bookingStatus === 'Pending' && booking.user?.email === auth.user?.email
+  const currentBookings = bookings?.filter((booking: Booking) => 
+    (booking.bookingStatus === 'Pending' || booking.bookingStatus === 'Confirmed') && 
+    booking.user?.email === auth.user?.email
   ) ?? [];
-  console.log("Pending bookings after filter:", pendingBookings);
   
   const historyBookings = bookings?.filter((booking: Booking) => 
     (booking.bookingStatus === 'Cancelled' || booking.bookingStatus === 'Completed') && 
@@ -81,9 +81,9 @@ console.log("Current userProfile state:", userProfile); // Check the current sta
     console.log('User ID:', auth.userId);
     console.log('User object:', auth.user);
     console.log('All bookings:', bookings);
-    console.log('Pending bookings:', pendingBookings);
+    console.log('Pending bookings:', currentBookings);
     console.log('History bookings:', historyBookings);
-  }, [auth, bookings, pendingBookings, historyBookings]);
+  }, [auth, bookings, currentBookings, historyBookings]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -158,7 +158,7 @@ console.log("Current userProfile state:", userProfile); // Check the current sta
     }
   };
 
-  console.log('Pending bookings:', pendingBookings);
+  console.log('Pending bookings:', currentBookings);
 
 
   const renderCurrentBookings = () => {
@@ -174,27 +174,18 @@ console.log("Current userProfile state:", userProfile); // Check the current sta
       return <p>No bookings data available.</p>;
     }
   
-    console.log('All bookings:', bookings);
-    console.log('Pending bookings:', pendingBookings);
-    console.log('User ID:', auth.userId);
+    const currentBookings = bookings.filter((booking: Booking) => 
+      (booking.bookingStatus === 'Pending' || booking.bookingStatus === 'Confirmed') && 
+      booking.user?.email === auth.user?.email
+    );
   
-    if (pendingBookings.length === 0) {
-      return (
-        <div>
-          <p>No pending bookings found for user email {auth.user?.email || 'Unknown'}.</p>
-          <p>Total bookings: {bookings?.length || 0}</p>
-          <p>User ID type: {typeof auth.userId}</p>
-          <p>Bookings statuses: {bookings?.map(b => b.bookingStatus).join(', ') || 'No bookings'}</p>
-          <p>Bookings user emails: {bookings?.map(b => b.user ? b.user.email : 'undefined').join(', ') || 'No bookings'}</p>
-          <p>First booking user object: {JSON.stringify(bookings?.[0]?.user || 'No bookings')}</p>
-        </div>
-      );
-    } 
-    
-
+    if (currentBookings.length === 0) {
+      return <p>No current bookings found.</p>;
+    }
+  
     return (
       <div className="flex flex-wrap -mx-2">
-        {pendingBookings.map((booking: Booking) => (
+        {currentBookings.map((booking: Booking) => (
           <div key={booking.id} className="w-full sm:w-1/2 md:w-1/3 px-2 mb-4">
             <div className="bg-gray-900 p-4 rounded-lg shadow-lg h-full flex flex-col justify-between">
               <div>
@@ -204,21 +195,24 @@ console.log("Current userProfile state:", userProfile); // Check the current sta
                 <p>Total Amount: ${booking.totalAmount}</p>
                 <p>Location: {booking.location.name}</p>
                 <p>Vehicle Daily Rate: ${booking.vehicle.rentalRate}</p>
+                <p>Status: {booking.bookingStatus}</p>
               </div>
               <div className="mt-4 space-x-2">
-              <button
-  className="bg-green-600 py-2 px-4 rounded hover:bg-green-700 transition"
-  onClick={() => handlePayment(booking)}
->
-  Pay
-</button>
+                {booking.bookingStatus === 'Pending' && (
+                  <button
+                    className="bg-green-600 py-2 px-4 rounded hover:bg-green-700 transition"
+                    onClick={() => handlePayment(booking)}
+                  >
+                    Pay
+                  </button>
+                )}
                 <button
-  className="bg-red-600 py-2 px-4 rounded hover:bg-red-700 transition"
-  onClick={() => handleCancelBooking(booking)}
-  disabled={isCancelling}
->
-  {isCancelling ? 'Cancelling...' : 'Cancel Booking'}
-</button>
+                  className="bg-red-600 py-2 px-4 rounded hover:bg-red-700 transition"
+                  onClick={() => handleCancelBooking(booking)}
+                  disabled={isCancelling}
+                >
+                  {isCancelling ? 'Cancelling...' : 'Cancel Booking'}
+                </button>
               </div>
             </div>
           </div>

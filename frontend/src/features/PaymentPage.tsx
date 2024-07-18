@@ -25,42 +25,49 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ clientSecret, bookingId, tota
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setProcessing(true);
-
+  
     if (!stripe || !elements) {
+      setError('Stripe has not been initialized');
+      setProcessing(false);
       return;
     }
-
+  
     const cardElement = elements.getElement(CardElement);
     if (!cardElement) {
       setError('Card element not found');
       setProcessing(false);
       return;
     }
-
-    const result = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
+  
+    try {
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'card',
         card: cardElement,
-      },
-    });
-
-    if (result.error) {
-      setError(result.error.message || 'An error occurred');
-      setProcessing(false);
-    } else if (result.paymentIntent) {
-      try {
-        await processPayment({ 
+      });
+  
+      if (error) {
+        setError(error.message || 'An error occurred during payment method creation');
+      } else if (paymentMethod) {
+        const response = await processPayment({ 
           bookingId, 
-          paymentMethodId: result.paymentIntent.payment_method as string 
-        });
-        alert('Payment successful!');
-        navigate('/booking-confirmation');
-      } catch (err) {
-        setError('Payment failed. Please try again.');
+          paymentMethodId: paymentMethod.id 
+        }).unwrap();
+        
+        if (response) {
+          alert('Payment successful!');
+          navigate('/booking-confirmation');
+        } else {
+          setError('Payment failed. Please try again.');
+        }
       }
+    } catch (err) {
+      setError('An error occurred during payment processing. Please try again.');
+      console.error(err);
+    } finally {
       setProcessing(false);
     }
   };
-
+  
   return (
     <form onSubmit={handleSubmit}>
       <CardElement />

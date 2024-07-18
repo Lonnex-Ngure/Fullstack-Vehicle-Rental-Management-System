@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from 'react-router-dom';
@@ -35,7 +35,7 @@ interface BookingFormData extends FormData {
   locationId: number;
 }
 
-const BookingPage: React.FC = () => {
+const BookingPage = () => {
   const { id } = useParams<{ id: string }>();
   const formData = useSelector((state: RootState) => state.form) as FormData;
   const user = useSelector((state: RootState) => state.auth.user);

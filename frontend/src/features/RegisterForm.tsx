@@ -1,4 +1,3 @@
-import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { apiSlice } from '../services/apiSlice';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +10,7 @@ interface FormData {
   password: string;
 }
 
-const RegisterForm: React.FC = () => {
+const RegisterForm = () => {
   const { register, handleSubmit } = useForm<FormData>();
   const [registerUser] = apiSlice.useRegisterUserMutation();
   const navigate = useNavigate();

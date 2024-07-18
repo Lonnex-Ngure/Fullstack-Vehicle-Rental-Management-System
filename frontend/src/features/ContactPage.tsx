@@ -1,4 +1,3 @@
-import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -9,7 +8,7 @@ interface FormData {
   message: string;
 }
 
-const ContactPage: React.FC = () => {
+const ContactPage = () => {
   const { register, handleSubmit } = useForm<FormData>();
   const onSubmit: SubmitHandler<FormData> = data => {
     console.log(data);

@@ -68,7 +68,7 @@ export const bookingApiSlice = createApi({
         body: data,
       }),
     }),
-    processPayment: builder.mutation<void, { bookingId: number; paymentMethodId: string }>({
+    processPayment: builder.mutation<TIPayment, { bookingId: number; paymentMethodId: string }>({
       query: (data) => ({
         url: '/payments/process',
         method: 'POST',

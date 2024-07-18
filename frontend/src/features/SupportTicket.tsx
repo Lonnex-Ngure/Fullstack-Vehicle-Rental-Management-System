@@ -1,4 +1,3 @@
-import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 interface SupportTicketFormData {
@@ -6,7 +5,7 @@ interface SupportTicketFormData {
   description: string;
 }
 
-const SupportTicket: React.FC = () => {
+const SupportTicket = () => {
   const { register, handleSubmit } = useForm<SupportTicketFormData>();
   const onSubmit: SubmitHandler<SupportTicketFormData> = data => {
     console.log(data);

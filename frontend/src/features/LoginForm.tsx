@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { apiSlice } from '../services/apiSlice'; 
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,7 +11,7 @@ interface FormData {
   password: string;
 }
 
-const LoginForm: React.FC = () => {
+const LoginForm = () => {
   const { register, handleSubmit } = useForm<FormData>();
   const [loginUser] = apiSlice.useLoginUserMutation(); 
   const navigate = useNavigate();

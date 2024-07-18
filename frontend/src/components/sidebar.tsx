@@ -1,7 +1,6 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Sidebar: React.FC = () => {
+const Sidebar = () => {
   return (
     <aside className="bg-gray-900 text-white w-64 p-4">
       <h2 className="text-2xl font-bold mb-8">Admin Dashboard</h2>
