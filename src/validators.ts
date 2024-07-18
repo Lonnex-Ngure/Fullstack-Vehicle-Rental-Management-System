@@ -90,7 +90,7 @@ export const customerSupportTicketSchema = z.object({
   userId: z.number().int().positive("User ID must be positive"),
   subject: z.string().min(1, "Subject is required").max(255),
   description: z.string().min(1, "Description is required"),
-  status: z.string().min(1, "Status is required").max(20),
+  //status: z.string().min(1, "Status is required").max(20),
 });
 
 // Fleet Management Table Validators

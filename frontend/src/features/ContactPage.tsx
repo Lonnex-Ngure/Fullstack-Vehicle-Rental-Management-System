@@ -1,4 +1,7 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store'; 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -10,8 +13,20 @@ interface FormData {
 
 const ContactPage = () => {
   const { register, handleSubmit } = useForm<FormData>();
+  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth.user);
+
   const onSubmit: SubmitHandler<FormData> = data => {
     console.log(data);
+  };
+
+  const handleCreateSupportTicket = () => {
+    if (user) {
+      navigate('/support-ticket');
+    } else {
+      alert('You need to be logged in to create a support ticket.');
+      navigate('/login');
+    }
   };
 
   return (
@@ -87,7 +102,10 @@ const ContactPage = () => {
         </section>
         <section className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-6">Need More Help?</h2>
-          <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+          <button 
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleCreateSupportTicket}
+          >
             Create a Support Ticket
           </button>
         </section>

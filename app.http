@@ -393,10 +393,10 @@ Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNiIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzIwMTAxMzc3fQ.qutw-gpFAN3Ap7oD3MAdtCEwKxgDLCzKZFcqzrjoJag
 
 {
-  "userId": 1,
+  "userId": 10,
   "subject": "Vehicle Issue",
-  "description": "The car I rented has a flat tire.",
-  "status": "Open"
+  "description": "The car i rented has alignment issues."
+
 }
 
 ###
@@ -408,8 +408,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNyIsInJvbGUiOiJh
 {
   "userId": 1,
   "subject": "Vehicle Issue - Updated",
-  "description": "The car I rented has a flat tire. A technician has been dispatched.",
-  "status": "In Progress"
+  "description": "The car I rented has a flat tire. A technician has been dispatched."
 }
 
 ###

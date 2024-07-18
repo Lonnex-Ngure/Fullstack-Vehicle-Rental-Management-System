@@ -26,7 +26,7 @@ const LoginForm = () => {
         user: {
           id: response.user.userId,
           email: response.user.email,
-          role: response.user.role // Make sure your API returns the user's role
+          role: response.user.role 
         },
         token: response.token
       }));

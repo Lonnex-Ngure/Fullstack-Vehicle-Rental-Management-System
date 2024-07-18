@@ -80,7 +80,6 @@ export const BookingsTable = pgTable("bookings", {
   bookingStatus: varchar("booking_status", { length: 20 })
     .notNull()
     .default("Pending"),
-  location: varchar("location", { length: 255 }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -121,7 +120,7 @@ export const CustomerSupportTicketsTable = pgTable("customer_support_tickets", {
     .references(() => UsersTable.userId),
   subject: varchar("subject", { length: 255 }).notNull(),
   description: text("description").notNull(),
-  status: varchar("status", { length: 20 }).notNull(),
+  status: varchar("status", { length: 20 }).default("open").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -23,6 +23,7 @@ export interface Ticket {
   subject: string;
   description: string;
   status: string;
+  userId: number; 
   user: {
     userId: number;
     fullName: string;
@@ -143,6 +144,13 @@ getTickets: builder.query<Ticket[], void>({
   query: () => ({
     url: '/customer-support-tickets',
     method: 'GET',
+  }),
+}),
+createSupportTicket: builder.mutation<Ticket, Partial<Ticket>>({
+  query: (newTicket) => ({
+    url: '/customer-support-tickets',
+    method: 'POST',
+    body: newTicket,
   }),
 }),
 updateTicket: builder.mutation<Ticket, Partial<Ticket> & { userId: number }>({
