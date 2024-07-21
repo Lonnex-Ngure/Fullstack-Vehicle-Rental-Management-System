@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { loadStripe, StripeError } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { bookingApiSlice } from '../services/bookingApiSlice';
@@ -14,7 +14,7 @@ interface PaymentFormProps {
   totalAmount: number;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ clientSecret, bookingId, totalAmount }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ bookingId, totalAmount }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);

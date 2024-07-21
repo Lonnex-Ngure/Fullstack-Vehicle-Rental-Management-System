@@ -13,8 +13,30 @@ export interface User {
     user: User;
   }
 
-  export interface VehicleSpecification {
-    vehicleSpecId: number;
+// types.ts
+
+// types.ts
+
+export interface VehicleSpecification {
+  vehicleSpecId: number;
+  manufacturer: string;
+  model: string;
+  year: number;
+  fuelType: string;
+  engineCapacity: number;
+  transmission: string;
+  seatingCapacity: number;
+  color: string;
+  features?: string;
+  imageUrl?: string; // Make imageUrl optional
+}
+
+export interface Vehicle {
+  vehicleId: string | number;
+  vehicleSpecId: number;
+  rentalRate: number;
+  availability: boolean;
+  specification: {
     manufacturer: string;
     model: string;
     year: number;
@@ -24,19 +46,9 @@ export interface User {
     seatingCapacity: number;
     color: string;
     features?: string;
-  }
-  
-  export interface Vehicle {
-    vehicleId: string | number;
-    vehicleSpecId: number;
-    rentalRate: number;
-    availability: boolean;
-    createdAt: string;
-    updatedAt: string;
-    imageUrl: string; // Assuming you have an imageUrl field
-    specifications: VehicleSpecification; // Assuming you join the specs with the vehicle
-  }
-
+    imageUrl?: string;
+  };
+}
 // src/types.ts
 export interface User {
   Id: string;

@@ -1,9 +1,29 @@
-import React, { useState} from 'react';
+import { useState, useEffect} from 'react';
 import { useDispatch } from 'react-redux';
 import { logout } from '../slices/authslice';
 import { useNavigate } from 'react-router-dom';
 import {vehicleApiSlice} from '../services/vehicleApiSlice'
 import {apiSlice, Ticket, FleetManagementItem } from '../services/apiSlice'
+import { bookingApiSlice } from '../services/bookingApiSlice';
+import { Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface User {
   userId: number;
@@ -20,6 +40,18 @@ interface Location {
   address: string;
   contactPhone: string;
 }
+
+interface Vehicle {
+  vehicleId: number;
+  specification: {
+    manufacturer: string;
+    model: string;
+    year: number;
+  };
+  rentalRate: number;
+  availability: boolean;
+}
+
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState('Dashboard');
@@ -46,19 +78,18 @@ const [deleteFleetItem] = apiSlice.useDeleteFleetManagementItemMutation();
 const [createFleetItem] = apiSlice.useCreateFleetManagementItemMutation();
 
 const [editingFleetItem, setEditingFleetItem] = useState<FleetManagementItem | null>(null);
-  const [newFleetItem, setNewFleetItem] = useState<Partial<FleetManagementItem>>({
-    acquisitionDate: new Date().toISOString().split('T')[0],
-    depreciationRate: 0,
-    currentValue: 0,
-    maintenanceCost: 0,
-    status: 'Active',
-    vehicle: {
-      vehicleId: 0,
-      rentalRate: 0,
-      availability: true,
-    },
-  });
-
+const [newFleetItem, setNewFleetItem] = useState<Partial<FleetManagementItem>>({
+  acquisitionDate: new Date().toISOString().split('T')[0],
+  depreciationRate: 0,
+  currentValue: 0,
+  maintenanceCost: 0,
+  status: 'Active',
+  vehicle: {
+    vehicleId: 0,
+    rentalRate: 0,
+    availability: true,
+  },
+});
 
 const [editingLocation, setEditingLocation] = useState<Location | null>(null);
 const [newLocation, setNewLocation] = useState<Partial<Location>>({
@@ -223,21 +254,15 @@ const [newLocation, setNewLocation] = useState<Partial<Location>>({
     }
   };
   
-
   const handleDeleteFleetItem = async (fleetId: number) => {
     try {
       await deleteFleetItem(fleetId).unwrap();
-      console.log(`Successfully deleted fleet item with ID: ${fleetId}`);
-      
-      // Delay the refetch slightly
-      setTimeout(() => {
-        refetchFleet();
-      }, 300);
+      refetchFleet();
     } catch (err) {
       console.error('Failed to delete fleet item:', err);
     }
   };
-
+  
   const handleAddNewFleetItem = async () => {
     try {
       const newItem = {
@@ -248,8 +273,7 @@ const [newLocation, setNewLocation] = useState<Partial<Location>>({
         maintenanceCost: newFleetItem.maintenanceCost || 0,
         status: newFleetItem.status || 'Active',
       };
-      const result = await createFleetItem(newItem).unwrap();
-      console.log('Create response:', result);
+      await createFleetItem(newItem).unwrap();
       setNewFleetItem({
         acquisitionDate: new Date().toISOString().split('T')[0],
         depreciationRate: 0,
@@ -268,6 +292,68 @@ const [newLocation, setNewLocation] = useState<Partial<Location>>({
     }
   };
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      refetchFleet();
+    }, 30000); // Refetch every 30 seconds
+
+    return () => clearInterval(intervalId);
+  }, [refetchFleet]);
+
+  const { data: bookings, error: _bookingsError, isLoading: _isBookingsLoading } = bookingApiSlice.useGetBookingsQuery();
+
+  const [totalBookings, setTotalBookings] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [monthlyData, setMonthlyData] = useState<{ [key: string]: { bookings: number; revenue: number } }>({});
+
+  useEffect(() => {
+    if (bookings) {
+      setTotalBookings(bookings.length);
+      const revenue = bookings.reduce((sum, booking) => sum + booking.totalAmount, 0);
+      setTotalRevenue(revenue);
+
+      const monthlyStats: { [key: string]: { bookings: number; revenue: number } } = {};
+      bookings.forEach(booking => {
+        const month = new Date(booking.bookingDate).toLocaleString('default', { month: 'long' });
+        if (!monthlyStats[month]) {
+          monthlyStats[month] = { bookings: 0, revenue: 0 };
+        }
+        monthlyStats[month].bookings += 1;
+        monthlyStats[month].revenue += booking.totalAmount;
+      });
+      setMonthlyData(monthlyStats);
+    }
+  }, [bookings]);
+
+  const chartData = {
+    labels: Object.keys(monthlyData),
+    datasets: [
+      {
+        label: 'Bookings',
+        data: Object.values(monthlyData).map(data => data.bookings),
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      },
+      {
+        label: 'Revenue',
+        data: Object.values(monthlyData).map(data => data.revenue),
+        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'Monthly Bookings and Revenue',
+      },
+    },
+  };
+
   const renderActiveSection = () => {
     switch (activeSection) {
       case 'Dashboard':
@@ -276,43 +362,20 @@ const [newLocation, setNewLocation] = useState<Partial<Location>>({
             <header className="mb-8">
               <h1 className="text-3xl font-bold">Overview</h1>
             </header>
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
                 <h2 className="text-xl font-bold">Total Bookings</h2>
-                <p className="text-2xl">1,234</p>
+                <p className="text-2xl">{totalBookings}</p>
               </div>
               <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
-                <h2 className="text-xl font-bold">Revenue</h2>
-                <p className="text-2xl">$567,890</p>
-              </div>
-              <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
-                <h2 className="text-xl font-bold">Active Rentals</h2>
-                <p className="text-2xl">123</p>
+                <h2 className="text-xl font-bold">Total Revenue</h2>
+                <p className="text-2xl">${totalRevenue.toLocaleString()}</p>
               </div>
             </section>
             <section className="mb-8">
-              <div className="flex space-x-4 mb-4">
-                <button className="bg-red-600 py-2 px-4 rounded">Add Vehicle</button>
-                <button className="bg-red-600 py-2 px-4 rounded">Manage Users</button>
-                <button className="bg-red-600 py-2 px-4 rounded">View Reports</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
-                  <h2 className="text-xl font-bold">Recent Bookings</h2>
-                  {/* Content for Recent Bookings */}
-                </div>
-                <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
-                  <h2 className="text-xl font-bold">Revenue Chart</h2>
-                  {/* Content for Revenue Chart */}
-                </div>
-                <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
-                  <h2 className="text-xl font-bold">Vehicle Utilization Chart</h2>
-                  {/* Content for Vehicle Utilization Chart */}
-                </div>
-                <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
-                  <h2 className="text-xl font-bold">Fleet Status Summary</h2>
-                  {/* Content for Fleet Status Summary */}
-                </div>
+              <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+                <h2 className="text-xl font-bold mb-4">Monthly Statistics</h2>
+                <Bar options={chartOptions} data={chartData} />
               </div>
             </section>
           </>
@@ -340,7 +403,7 @@ const [newLocation, setNewLocation] = useState<Partial<Location>>({
                       </tr>
                     </thead>
                     <tbody>
-                      {vehicles?.map((vehicle) => (
+                    {vehicles?.map((vehicle: Vehicle) => (
                         <tr key={vehicle.vehicleId} className="border-t border-gray-800">
                           <td className="px-4 py-2">{vehicle.vehicleId}</td>
                           <td className="px-4 py-2">{vehicle.specification.manufacturer}</td>
@@ -539,7 +602,55 @@ const [newLocation, setNewLocation] = useState<Partial<Location>>({
         return (
           <div>
             <h1 className="text-3xl font-bold mb-4">Reports</h1>
-            {/* Add reports content here */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Revenue Report */}
+              <div className="bg-gray-900 p-4 rounded-lg">
+                <h2 className="text-xl font-bold mb-2">Revenue Report</h2>
+                <Bar options={chartOptions} data={chartData} />
+              </div>
+      
+              {/* Vehicle Utilization Report */}
+              <div className="bg-gray-900 p-4 rounded-lg">
+                <h2 className="text-xl font-bold mb-2">Vehicle Utilization</h2>
+                <p>Total Vehicles: {fleetManagement?.length}</p>
+                <p>Available Vehicles: {fleetManagement?.filter(item => item.vehicle.availability).length}</p>
+                <p>Utilization Rate: {((fleetManagement?.filter(item => !item.vehicle.availability).length || 0) / (fleetManagement?.length || 1) * 100).toFixed(2)}%</p>
+              </div>
+      
+              {/* Maintenance Cost Report */}
+              <div className="bg-gray-900 p-4 rounded-lg">
+                <h2 className="text-xl font-bold mb-2">Maintenance Cost Report</h2>
+                <p>Total Maintenance Cost: ${fleetManagement?.reduce((sum, item) => sum + item.maintenanceCost, 0).toLocaleString()}</p>
+                <p>Average Cost per Vehicle: ${(fleetManagement 
+  ? fleetManagement.reduce((sum, item) => sum + (item.maintenanceCost || 0), 0) / fleetManagement.length 
+  : 0).toFixed(2)}</p>
+              </div>
+      
+              {/* Customer Support Report */}
+              <div className="bg-gray-900 p-4 rounded-lg">
+                <h2 className="text-xl font-bold mb-2">Customer Support Report</h2>
+                <p>Total Tickets: {tickets?.length}</p>
+                <p>Open Tickets: {tickets?.filter(ticket => ticket.status !== 'Resolved').length}</p>
+                <p>Resolution Rate: {((tickets?.filter(ticket => ticket.status === 'Resolved').length || 0) / (tickets?.length || 1) * 100).toFixed(2)}%</p>
+              </div>
+      
+              {/* User Demographics Report */}
+              <div className="bg-gray-900 p-4 rounded-lg">
+                <h2 className="text-xl font-bold mb-2">User Demographics</h2>
+                <p>Total Users: {users?.length}</p>
+                <p>Admin Users: {users?.filter(user => user.role === 'admin').length}</p>
+                <p>Regular Users: {users?.filter(user => user.role === 'user').length}</p>
+              </div>
+      
+              {/* Fleet Value Report */}
+              <div className="bg-gray-900 p-4 rounded-lg">
+                <h2 className="text-xl font-bold mb-2">Fleet Value Report</h2>
+                <p>Total Fleet Value: ${fleetManagement?.reduce((sum, item) => sum + item.currentValue, 0).toLocaleString()}</p>
+                <p>Average Vehicle Value: ${(fleetManagement 
+  ? fleetManagement.reduce((sum, item) => sum + (item.currentValue || 0), 0) / fleetManagement.length 
+  : 0).toFixed(2)}</p>
+              </div>
+            </div>
           </div>
         );
       case 'Locations and Branches':
@@ -907,7 +1018,12 @@ const [newLocation, setNewLocation] = useState<Partial<Location>>({
                 value={newFleetItem.vehicle?.vehicleId || ''}
                 onChange={(e) => setNewFleetItem({
                   ...newFleetItem,
-                  vehicle: { ...newFleetItem.vehicle, vehicleId: parseInt(e.target.value) }
+                  vehicle: { 
+                    ...newFleetItem.vehicle, 
+                    vehicleId: parseInt(e.target.value),
+                    rentalRate: newFleetItem.vehicle?.rentalRate || 0,
+                    availability: newFleetItem.vehicle?.availability || true
+                  }
                 })}
               />
               <input
@@ -973,12 +1089,12 @@ const [newLocation, setNewLocation] = useState<Partial<Location>>({
     }
   };
 
-  const handleEdit = (id: string) => {
+  const handleEdit = (id: number) => {
     // Implement edit functionality
     console.log(`Edit vehicle with id: ${id}`);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: number) => {
     // Implement delete functionality
     console.log(`Delete vehicle with id: ${id}`);
   };

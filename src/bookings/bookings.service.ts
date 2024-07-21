@@ -32,7 +32,7 @@ export const bookingService = {
         returnDate: true,
         totalAmount: true,
         bookingStatus: true,
-        location: true, 
+ 
       },
       with: {
         user: {
@@ -71,8 +71,7 @@ export const bookingService = {
         bookingDate: true,
         returnDate: true,
         totalAmount: true,
-        bookingStatus: true,
-        location: true, 
+        bookingStatus: true, 
       },
       where: (bookingsTable) => eq(bookingsTable.bookingId, id),
       with: {
@@ -115,7 +114,6 @@ export const bookingService = {
         returnDate: BookingsTable.returnDate,
         totalAmount: BookingsTable.totalAmount,
         bookingStatus: BookingsTable.bookingStatus,
-        location: BookingsTable.location,
         userId: BookingsTable.userId,
         vehicleId: BookingsTable.vehicleId,
         locationId: BookingsTable.locationId,
@@ -134,7 +132,6 @@ export const bookingService = {
         returnDate: BookingsTable.returnDate,
         totalAmount: BookingsTable.totalAmount,
         bookingStatus: BookingsTable.bookingStatus,
-        location: BookingsTable.location,
         userId: BookingsTable.userId,
         vehicleId: BookingsTable.vehicleId,
         locationId: BookingsTable.locationId,

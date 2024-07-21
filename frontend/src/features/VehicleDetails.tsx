@@ -74,11 +74,14 @@ const VehicleDetails = () => {
       <Header />
       <div className="container mx-auto py-8">
         <div className="bg-gray-900 p-4 rounded-lg shadow-lg flex justify-center items-center">
-          <img
-            src={vehicle.imageUrl || "vehicle-main.jpg"}
-            alt={`${vehicle.specification?.manufacturer} ${vehicle.specification?.model}`}
-            className="w-full max-w-2xl h-64 object-cover rounded"
-          />
+        <img
+  src={vehicle.specification?.imageUrl || "https://via.placeholder.com/300x200?text=No+Image"}
+  alt={`${vehicle.specification?.manufacturer} ${vehicle.specification?.model}`}
+  className="w-full max-w-2xl h-64 object-cover rounded"
+  onError={(e) => {
+    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=No+Image';
+  }}
+/>
         </div>
         <div className="mt-8 bg-gray-900 p-8 rounded-lg shadow-lg flex">
           <div className="w-1/2">

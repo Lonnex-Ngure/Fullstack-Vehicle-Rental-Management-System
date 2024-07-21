@@ -20,35 +20,37 @@ type VehicleSpecificationWithDetails = Omit<
 };
 
 export const vehicleSpecificationService = {
-    list: async (): Promise<VehicleSpecificationWithDetails[]> => {
-        const vehicleSpecifications = await db.query.VehicleSpecificationsTable.findMany({
-          columns: {
-            manufacturer: true,
-            model: true,
-            year: true,
-            fuelType: true,
-            engineCapacity: true,
-            transmission: true,
-            seatingCapacity: true,
-            color: true,
-            features: true,
-          },
-          with: {
-            vehicle: {
-              columns: {
-                vehicleId: true,
-                rentalRate: true,
-                availability: true,
-              },
+  list: async (): Promise<VehicleSpecificationWithDetails[]> => {
+    const vehicleSpecifications =
+      await db.query.VehicleSpecificationsTable.findMany({
+        columns: {
+          manufacturer: true,
+          model: true,
+          year: true,
+          fuelType: true,
+          engineCapacity: true,
+          transmission: true,
+          seatingCapacity: true,
+          color: true,
+          features: true,
+          imageUrl: true,
+        },
+        with: {
+          vehicle: {
+            columns: {
+              vehicleId: true,
+              rentalRate: true,
+              availability: true,
             },
           },
-        });
-      
-        return vehicleSpecifications.map(spec => ({
-          ...spec,
-          vehicles: spec.vehicle ? [spec.vehicle] : []
-        }));
-      },
+        },
+      });
+
+    return vehicleSpecifications.map((spec) => ({
+      ...spec,
+      vehicles: spec.vehicle ? [spec.vehicle] : [],
+    }));
+  },
   getById: async (id: number): Promise<TIVehicleSpecification | undefined> => {
     return await db.query.VehicleSpecificationsTable.findFirst({
       columns: {
@@ -61,8 +63,10 @@ export const vehicleSpecificationService = {
         seatingCapacity: true,
         color: true,
         features: true,
+        imageUrl: true,
       },
-      where: (vehicleSpecificationsTable) => eq(vehicleSpecificationsTable.vehicleSpecId, id),
+      where: (vehicleSpecificationsTable) =>
+        eq(vehicleSpecificationsTable.vehicleSpecId, id),
       with: {
         vehicle: {
           columns: {
@@ -74,7 +78,9 @@ export const vehicleSpecificationService = {
       },
     });
   },
-  create: async (vehicleSpec: TIVehicleSpecification): Promise<TIVehicleSpecification> => {
+  create: async (
+    vehicleSpec: TIVehicleSpecification
+  ): Promise<TIVehicleSpecification> => {
     const result = await db
       .insert(VehicleSpecificationsTable)
       .values(vehicleSpec)
@@ -93,7 +99,10 @@ export const vehicleSpecificationService = {
       .execute();
     return result[0];
   },
-  update: async (id: number, vehicleSpec: TIVehicleSpecification): Promise<TIVehicleSpecification | null> => {
+  update: async (
+    id: number,
+    vehicleSpec: TIVehicleSpecification
+  ): Promise<TIVehicleSpecification | null> => {
     const result = await db
       .update(VehicleSpecificationsTable)
       .set(vehicleSpec)

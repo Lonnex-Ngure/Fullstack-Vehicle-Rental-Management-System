@@ -1,15 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+// in bookingSlice.ts
 export interface Booking {
   id: string;
-  vehicleId: string;
+  userId: number;
+  vehicleId: number;
+  locationId: number;
   bookingDate: string;
   returnDate: string;
-  locationId: number;  // Changed from 'location: string'
   totalAmount: number;
+  bookingStatus: string;
   gps: boolean;
   insurance: boolean;
   additionalDriver: boolean;
+  rentalRate: number;
 }
 
 export interface BookingState {

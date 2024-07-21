@@ -135,7 +135,7 @@ GET http://localhost:8000/api/vehicles
 ###
 
 # Get vehicle by ID (protected, user or admin)
-GET http://localhost:8000/api/vehicles/4
+GET http://localhost:8000/api/vehicles/1
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNiIsInJvbGUiOiJ1c2VyIiwiZXhwIjoxNzIwMDkwMzQyfQ.myeXIzVjPf7Cs-mN7MgJjeaJ9Unr0yXJfP9rvTUAFtQ
 
 

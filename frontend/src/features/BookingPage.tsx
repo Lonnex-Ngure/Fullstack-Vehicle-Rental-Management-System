@@ -10,8 +10,25 @@ import { bookingApiSlice } from '../services/bookingApiSlice';
 import { addBooking } from '../slices/bookingSlice';
 import { BookingData } from '../types';
 import { apiSlice } from '../services/apiSlice';
-import { setLocationId } from '../slices/formSlice'; 
-
+import { setLocationId } from '../slices/formSlice';
+import { Booking } from '../slices/bookingSlice';
+ 
+function mapApiResultToBooking(result: any): Booking {
+  return {
+    id: result.id?.toString() || '',
+    userId: Number(result.userId) || 0,
+    vehicleId: Number(result.vehicleId) || 0,
+    locationId: Number(result.locationId) || 0,
+    bookingDate: result.bookingDate || '',
+    returnDate: result.returnDate || '',
+    totalAmount: Number(result.totalAmount) || 0,
+    bookingStatus: result.bookingStatus || '',
+    gps: Boolean(result.gps),
+    insurance: Boolean(result.insurance),
+    additionalDriver: Boolean(result.additionalDriver),
+    rentalRate: Number(result.rentalRate) || 0,
+  };
+}
 
 interface BookingFormData extends FormData {
   gps: boolean;
@@ -21,12 +38,7 @@ interface BookingFormData extends FormData {
 
 }
 
-interface Location {
-  locationId: number;
-  name: string;
-  address: string;
-  contactPhone: string;
-}
+
 
 interface BookingFormData extends FormData {
   gps: boolean;
@@ -40,7 +52,7 @@ const BookingPage = () => {
   const formData = useSelector((state: RootState) => state.form) as FormData;
   const user = useSelector((state: RootState) => state.auth.user);
   const currentVehicle = useSelector((state: RootState) => state.vehicle.currentVehicle);
-  const locationId = useSelector((state: RootState) => state.form.locationId);
+  
 
   const { register, handleSubmit, setValue, watch } = useForm<BookingFormData>({
     defaultValues: {
@@ -57,7 +69,8 @@ const BookingPage = () => {
   const [createBooking] = bookingApiSlice.useCreateBookingMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { data: locations = [], isLoading: isLoadingLocations, error: locationsError } = apiSlice.endpoints.getLocations.useQuery({});
+  const { data: locations = [], isLoading: isLoadingLocations, error: locationsError } = apiSlice.endpoints.getLocations.useQuery();
+
 
   useEffect(() => {
     console.log('Locations data:', locations);
@@ -118,12 +131,12 @@ useEffect(() => {
   
     try {
       const bookingData: BookingData = {
-        userId: user.id, // Make sure this is coming from your auth state
+        userId: user.id,
         vehicleId: parseInt(id, 10),
-        locationId: parseInt(data.locationId, 10), // Convert to number
+        locationId: data.locationId,
         bookingDate: new Date(data.bookingDate).toISOString(),
         returnDate: new Date(data.returnDate).toISOString(),
-        totalAmount: Math.round(totalPrice), // Make sure totalPrice is calculated correctly
+        totalAmount: Math.round(totalPrice),
         bookingStatus: "Pending",
         gps: data.gps || false,
         insurance: data.insurance || false,
@@ -131,29 +144,29 @@ useEffect(() => {
         rentalRate: parseFloat(currentVehicle?.rentalRate || '0')
       };
   
-    const result = await createBooking(bookingData).unwrap();
-
-    console.log('Booking created successfully:', result);
-    dispatch(addBooking(result));
-
-    // Navigate to payment page with booking data
-    navigate('/payment', { 
-      state: { 
-        bookingData: result,
-        vehicleSummary: {
-          manufacturer: currentVehicle?.specification?.manufacturer,
-          model: currentVehicle?.specification?.model,
-          category: currentVehicle?.specification?.category,
-          rentalRate: currentVehicle?.rentalRate,
-          imageUrl: currentVehicle?.imageUrl
-        },
-        totalAmount: totalPrice
-      } 
-    });
+      const result = await createBooking(bookingData).unwrap();
+      console.log('Booking created successfully:', result);
+  
+      const bookingResult = mapApiResultToBooking(result);
+      dispatch(addBooking(bookingResult));
+  
+      navigate('/payment', { 
+        state: { 
+          bookingData: bookingResult,
+          vehicleSummary: {
+            manufacturer: currentVehicle?.specification?.manufacturer,
+            model: currentVehicle?.specification?.model,
+            category: currentVehicle?.specification?.category,
+            rentalRate: currentVehicle?.rentalRate,
+            imageUrl: currentVehicle?.imageUrl
+          },
+          totalAmount: totalPrice
+        } 
+      });
     } catch (error: any) {
       console.error('Failed to create booking:', error);
       if (error.data && error.data.message) {
-        alert('Booking failed: ${error.data.message}');
+        alert(`Booking failed: ${error.data.message}`);
       } else if (error.data) {
         alert(`Booking failed: ${JSON.stringify(error.data)}`);
       } else {
@@ -260,7 +273,7 @@ useEffect(() => {
             </div>
             <div className="bg-gray-800 p-4 rounded mb-8">
               <h3 className="text-xl font-bold mb-2">Price Breakdown</h3>
-              <p>Base Price: ${formData.rentalRate * Math.ceil((new Date(watchedFields.returnDate).getTime() - new Date(watchedFields.bookingDate).getTime()) / (1000 * 60 * 60 * 24))}</p>
+              <p>Base Price: ${parseFloat(formData.rentalRate) * Math.ceil((new Date(watchedFields.returnDate).getTime() - new Date(watchedFields.bookingDate).getTime()) / (1000 * 60 * 60 * 24))}</p>
               <p>Service Fee: $50.00</p>
               {watchedFields.gps && <p>GPS: $10/day</p>}
               {watchedFields.insurance && <p>Insurance: $30/day</p>}

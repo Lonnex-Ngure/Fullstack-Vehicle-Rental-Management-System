@@ -19,6 +19,7 @@ type VehicleWithDetails = Omit<TSVehicle, "vehicleId" | "createdAt" | "updatedAt
     seatingCapacity: number;
     color: string;
     features?: string;
+    imageUrl?: string;
   };
 };
 
@@ -43,6 +44,7 @@ export const vehicleService = {
             seatingCapacity: true,
             color: true,
             features: true,
+            imageUrl: true,
           },
         },
       },
@@ -70,6 +72,7 @@ export const vehicleService = {
             seatingCapacity: true,
             color: true,
             features: true,
+            imageUrl: true,
           },
         },
       },
