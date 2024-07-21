@@ -1,12 +1,11 @@
 {
-  "name": ".",
+  "name": "backend",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "gen": "drizzle-kit generate",
     "migrate": "tsx src/drizzle/migrate.ts",
     "start": "node dist/index.js",
      "build":"tsc"
-
   },
   "dependencies": {
     "@hono/node-server": "^1.12.0",
