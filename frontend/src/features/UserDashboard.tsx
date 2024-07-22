@@ -36,7 +36,7 @@ const UserDashboard = () => {
   ) ?? [];
 
   const totalSpent = bookings?.reduce((total: number, booking: Booking) => {
-    if (booking.bookingStatus === 'Completed' && booking.user?.email === auth.user?.email) {
+    if (booking.bookingStatus === 'Confirmed' && booking.user?.email === auth.user?.email) {
       return total + booking.totalAmount;
     }
     return total;
