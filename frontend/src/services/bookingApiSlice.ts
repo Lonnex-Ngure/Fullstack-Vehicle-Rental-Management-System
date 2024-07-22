@@ -1,7 +1,18 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store';
+import { Key } from 'react';
+
+export interface TIPayment {
+  bookingId: number;
+  amount: number;
+  paymentStatus: string;
+  paymentDate: Date;
+  paymentMethod: string;
+  transactionId: string;
+}
 
 export interface Booking {
+  id: Key | null | undefined;
   bookingId: number;
   bookingDate: string;
   returnDate: string;
@@ -21,6 +32,10 @@ export interface Booking {
     address: string;
   };
   vehicle: {
+    imageUrl: any;
+    manufacturer: any;
+    model: any;
+    category: any;
     vehicleSpecId: number;
     rentalRate: number;
     availability: boolean;
@@ -54,10 +69,15 @@ export const bookingApiSlice = createApi({
       invalidatesTags: ['Booking'],
     }),
     updateBooking: builder.mutation<Booking, Partial<Booking> & { bookingId: number }>({
-      query: ({ bookingId, ...booking }) => ({
+      query: ({ bookingId, user, vehicle, location, ...booking }) => ({
         url: `/bookings/${bookingId}`,
         method: 'PUT',
-        body: booking,
+        body: {
+          ...booking,
+          userId: user?.userId,
+          vehicleId: vehicle?.vehicleSpecId,
+          locationId: location?.locationId,
+        },
       }),
       invalidatesTags: ['Booking'],
     }),

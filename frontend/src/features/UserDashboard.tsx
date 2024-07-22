@@ -137,9 +137,9 @@ console.log("Current userProfile state:", userProfile); // Check the current sta
       try {
         await updateBooking({
           bookingId: booking.bookingId,
-          userId: booking.user.userId,
-          vehicleId: booking.vehicle.vehicleSpecId,
-          locationId: booking.location.locationId,
+          user: booking.user,
+          vehicle: booking.vehicle,
+          location: booking.location,
           bookingDate: booking.bookingDate,
           returnDate: booking.returnDate,
           totalAmount: booking.totalAmount,
@@ -157,7 +157,6 @@ console.log("Current userProfile state:", userProfile); // Check the current sta
       }
     }
   };
-
   console.log('Pending bookings:', currentBookings);
 
 

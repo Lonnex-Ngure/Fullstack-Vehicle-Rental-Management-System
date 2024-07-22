@@ -16,6 +16,7 @@ import { Booking } from '../slices/bookingSlice';
 function mapApiResultToBooking(result: any): Booking {
   return {
     id: result.id?.toString() || '',
+    bookingId: result.bookingId || result.id || '',
     userId: Number(result.userId) || 0,
     vehicleId: Number(result.vehicleId) || 0,
     locationId: Number(result.locationId) || 0,
@@ -57,11 +58,11 @@ const BookingPage = () => {
   const { register, handleSubmit, setValue, watch } = useForm<BookingFormData>({
     defaultValues: {
       ...formData,
-      vehicleId: id ? parseInt(id, 10) : 0, // Set the vehicleId from the URL parameter
+      vehicleId: id ? parseInt(id, 10) : 0,
       gps: false,
       insurance: false,
       additionalDriver: false,
-      locationId: 0
+      locationId: formData.locationId || 0  // Ensure it's a number
     }
   });
 
@@ -133,7 +134,7 @@ useEffect(() => {
       const bookingData: BookingData = {
         userId: user.id,
         vehicleId: parseInt(id, 10),
-        locationId: data.locationId,
+        locationId: Number(data.locationId),  // Ensure it's a number
         bookingDate: new Date(data.bookingDate).toISOString(),
         returnDate: new Date(data.returnDate).toISOString(),
         totalAmount: Math.round(totalPrice),
@@ -235,12 +236,13 @@ useEffect(() => {
   className="w-full p-2 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-gray-600"
   {...register('locationId', { 
     required: true,
+    valueAsNumber: true,  // This will ensure the value is parsed as a number
     onChange: (e) => {
       const locationId = parseInt(e.target.value, 10);
       if (!isNaN(locationId)) {
         console.log('Selected location ID:', locationId);
         dispatch(setLocationId(locationId));
-        setValue('locationId', locationId); // This should set it as a number
+        setValue('locationId', locationId);
       }
     }
   })}

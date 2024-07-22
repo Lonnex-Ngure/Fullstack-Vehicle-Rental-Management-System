@@ -8,6 +8,7 @@ import formReducer from './slices/formSlice';
 import bookingReducer from './slices/bookingSlice'; 
 import { bookingApiSlice } from './services/bookingApiSlice';
 import vehicleReducer from './slices/vehicleSlice';
+import { Store } from '@reduxjs/toolkit';
 
 const persistConfig = {
   key: 'root',
@@ -26,7 +27,7 @@ const rootReducer = combineReducers({
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const store = configureStore({
+const store: Store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

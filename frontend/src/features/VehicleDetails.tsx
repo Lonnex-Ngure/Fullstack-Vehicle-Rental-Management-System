@@ -57,7 +57,8 @@ const VehicleDetails = () => {
       manufacturer: vehicle?.specification?.manufacturer ?? '',
       model: vehicle?.specification?.model ?? '',
       category: vehicle?.specification?.category ?? '',
-      imageUrl: vehicle?.imageUrl ?? ''
+      imageUrl: vehicle?.imageUrl ?? '',
+      locationId: 0 
     };
 
     dispatch(setFormData(formData));

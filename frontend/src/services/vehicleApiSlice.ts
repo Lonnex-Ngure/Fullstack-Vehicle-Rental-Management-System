@@ -19,7 +19,7 @@ export const vehicleApiSlice = createApi({
         url: `/vehicles/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: 'Vehicle', id }],
+      providesTags: (_, __, id) => [{ type: 'Vehicle', id }],
     }),
     addVehicle: builder.mutation({
       query: (vehicle) => ({
@@ -35,18 +35,17 @@ export const vehicleApiSlice = createApi({
         method: 'PUT',
         body: vehicle,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Vehicle', id }],
+      invalidatesTags: (_, __, arg) => [{ type: 'Vehicle', id: arg.id }],
     }),
-   deleteVehicle: builder.mutation({
-  query: (id) => ({
-    url: `/vehicles/${id}`,
-    method: 'PUT',
-    body: { availability: false },
-  }),
-  invalidatesTags: ['Vehicle'],
-}),
+    deleteVehicle: builder.mutation({
+      query: (id) => ({
+        url: `/vehicles/${id}`,
+        method: 'PUT',
+        body: { availability: false },
+      }),
+      invalidatesTags: ['Vehicle'],
+    }),
   }),
 });
-
 
 export default vehicleApiSlice;

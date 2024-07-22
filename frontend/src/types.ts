@@ -36,6 +36,7 @@ export interface Vehicle {
   vehicleSpecId: number;
   rentalRate: number;
   availability: boolean;
+  locationId: number;
   specification: {
     manufacturer: string;
     model: string;

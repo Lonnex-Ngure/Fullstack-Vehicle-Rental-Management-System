@@ -125,7 +125,8 @@ const VehicleListing = () => {
                             manufacturer: vehicle.specification.manufacturer,
                             model: vehicle.specification.model,
                             category: (vehicle.specification as any).category || '',
-                            imageUrl: vehicle.specification.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'
+                            imageUrl: vehicle.specification.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image',
+                            locationId: vehicle.locationId || 0 
                           };
                           dispatch(setFormData(formData));
                           navigate(`/booking/${vehicle.vehicleId}`);

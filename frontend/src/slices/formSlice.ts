@@ -1,4 +1,3 @@
-// formSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface FormData {
@@ -10,7 +9,7 @@ export interface FormData {
     model?: string;
     category?: string;
     imageUrl?: string;
-    locationId: number | null;
+    locationId?: number;
 }
 
 const initialState: FormData = {
@@ -18,7 +17,7 @@ const initialState: FormData = {
   returnDate: '',
   vehicleId: '',
   rentalRate: '',
-  locationId: null,
+  locationId: 0,
 };
 
 const formSlice = createSlice({
