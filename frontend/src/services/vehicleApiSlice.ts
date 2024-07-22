@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const vehicleApiSlice = createApi({
   reducerPath: 'vehicleApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8000/api' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://vehicle-rental-backend-xpxy.onrender.com/api' }),
   tagTypes: ['Vehicle'],
   endpoints: (builder) => ({
     fetchVehicles: builder.query({
