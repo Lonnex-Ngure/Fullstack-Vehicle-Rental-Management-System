@@ -9,14 +9,16 @@ import { setFormData } from '../slices/formSlice';
 import { setVehicleDetails } from '../slices/vehicleSlice';
 
 const VehicleDetails = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>(); // Get the vehicle ID from the URL parameters
   console.log("Vehicle ID from URL Params:", id);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
+  // Fetch vehicle data using the ID from the URL
   const { data: vehicle, error: vehicleError, isLoading: vehicleLoading } = vehicleApiSlice.useFetchVehicleByIdQuery(id!);
 
+   // Use useEffect to dispatch vehicle details when the vehicle data is fetched
   useEffect(() => {
     if (vehicle) {
       dispatch(setVehicleDetails(vehicle));
@@ -41,6 +43,7 @@ const VehicleDetails = () => {
     return <p className="text-white text-center py-8">No vehicle data available.</p>;
   }
 
+   // Extract features from the vehicle specification
   const features: string[] = vehicle.specification?.features?.split(',') ?? [];
 
   const handleBooking = () => {
@@ -116,15 +119,7 @@ const VehicleDetails = () => {
                   className="w-full p-2 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-gray-600"
                 />
               </div>
-              <div className="mb-4">
-                <label htmlFor="location" className="block text-sm font-medium mb-2">Location</label>
-                <input
-                  type="text"
-                  id="location"
-                  className="w-full p-2 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-gray-600"
-                  placeholder="Enter location manually"
-                />
-              </div>
+             
               <button
                 type="submit"
                 className="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded"
