@@ -47,7 +47,7 @@ export interface FleetManagementItem {
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://vehicle-rental-backend-xpxy.onrender.com' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://vehicle-rental-backend-xpxy.onrender.com/api' }),
   endpoints: (builder) => ({
     registerUser: builder.mutation({
       query: (newUser) => ({

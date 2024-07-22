@@ -45,7 +45,7 @@ export interface Booking {
 export const bookingApiSlice = createApi({
   reducerPath: 'bookingApi',
   baseQuery: fetchBaseQuery({ 
-    baseUrl: 'https://vehicle-rental-backend-xpxy.onrender.com',
+    baseUrl: 'https://vehicle-rental-backend-xpxy.onrender.com/api',
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token;
       if (token) {
