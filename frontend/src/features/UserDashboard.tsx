@@ -30,6 +30,18 @@ const UserDashboard = () => {
     booking.user?.email === auth.user?.email
   ) ?? [];
 
+  const activeBookings = bookings?.filter((booking: Booking) => 
+    (booking.bookingStatus === 'Pending' || booking.bookingStatus === 'Confirmed') && 
+    booking.user?.email === auth.user?.email
+  ) ?? [];
+
+  const totalSpent = bookings?.reduce((total: number, booking: Booking) => {
+    if (booking.bookingStatus === 'Completed' && booking.user?.email === auth.user?.email) {
+      return total + booking.totalAmount;
+    }
+    return total;
+  }, 0) ?? 0;
+
   const { data: profileData, isLoading: isProfileLoading, error: profileError } = apiSlice.useGetUserProfileQuery(auth.userId?.toString()) as {
     data: UserProfile | undefined;
     isLoading: boolean;
@@ -311,25 +323,22 @@ console.log("Current userProfile state:", userProfile); // Check the current sta
         <header className="mb-8">
         <h1 className="text-3xl font-bold">Welcome, {auth.user?.email.split('@')[0] || '[User Name]'}!</h1>
         </header>
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
             <h2 className="text-xl font-bold">Active Bookings</h2>
-            <p className="text-2xl">2</p>
+            <p className="text-2xl">{activeBookings.length}</p>
           </div>
           <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
             <h2 className="text-xl font-bold">Total Spent</h2>
-            <p className="text-2xl">$3,420</p>
-          </div>
-          <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold">Reward Points</h2>
-            <p className="text-2xl">1,150</p>
+            <p className="text-2xl">${totalSpent.toFixed(2)}</p>
           </div>
         </section>
         <section className="mb-8">
           {activeSection === 'dashboard' && (
             <div className="bg-gray-900 p-4 rounded-lg shadow-lg mb-4">
               <h2 className="text-xl font-bold">Dashboard</h2>
-              {/* Content for Dashboard */}
+              <p>Here you can see an overview of your account activity.</p>
+              {/* You can add more dashboard content here */}
             </div>
           )}
           {activeSection === 'bookVehicle' && (

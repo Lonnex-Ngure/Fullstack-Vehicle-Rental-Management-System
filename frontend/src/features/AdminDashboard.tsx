@@ -1081,7 +1081,68 @@ const [newLocation, setNewLocation] = useState<Partial<Location>>({
         return (
           <div>
             <h1 className="text-3xl font-bold mb-4">Settings</h1>
-            {/* Add settings content here */}
+            <div className="bg-gray-900 p-6 rounded-lg">
+              <h2 className="text-xl font-bold mb-4">General Settings</h2>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Company Name</label>
+                <input
+                  type="text"
+                  className="w-full bg-gray-800 text-white px-3 py-2 rounded"
+                  placeholder="Enter company name"
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-1">Contact Email</label>
+                <input
+                  type="email"
+                  className="w-full bg-gray-800 text-white px-3 py-2 rounded"
+                  placeholder="Enter contact email"
+                />
+              </div>
+      
+              <h2 className="text-xl font-bold mb-4">Security Settings</h2>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Password Policy</label>
+                <select className="w-full bg-gray-800 text-white px-3 py-2 rounded">
+                  <option>Strong (min. 12 characters, uppercase, lowercase, number, symbol)</option>
+                  <option>Medium (min. 8 characters, uppercase, lowercase, number)</option>
+                  <option>Basic (min. 6 characters)</option>
+                </select>
+              </div>
+              <div className="mb-6 flex items-center">
+                <input type="checkbox" id="twoFactor" className="mr-2" />
+                <label htmlFor="twoFactor" className="text-sm font-medium">Enable Two-Factor Authentication</label>
+              </div>
+      
+              <h2 className="text-xl font-bold mb-4">Notification Settings</h2>
+              <div className="mb-4 flex items-center">
+                <input type="checkbox" id="emailNotifications" className="mr-2" />
+                <label htmlFor="emailNotifications" className="text-sm font-medium">Enable Email Notifications</label>
+              </div>
+              <div className="mb-6 flex items-center">
+                <input type="checkbox" id="smsNotifications" className="mr-2" />
+                <label htmlFor="smsNotifications" className="text-sm font-medium">Enable SMS Notifications</label>
+              </div>
+      
+              <h2 className="text-xl font-bold mb-4">Data Management</h2>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Data Retention Period</label>
+                <select className="w-full bg-gray-800 text-white px-3 py-2 rounded">
+                  <option>1 year</option>
+                  <option>2 years</option>
+                  <option>3 years</option>
+                  <option>5 years</option>
+                </select>
+              </div>
+              <div className="mb-6">
+                <button className="bg-blue-600 text-white px-4 py-2 rounded mr-2">Export All Data</button>
+                <button className="bg-red-600 text-white px-4 py-2 rounded">Delete All Data</button>
+              </div>
+      
+              <button className="bg-red-600 text-white px-6 py-2 rounded font-bold">
+                Save Changes
+              </button>
+            </div>
           </div>
         );
       default:
