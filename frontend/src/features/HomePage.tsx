@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import heroImage from '../assets/pexels-introspectivedsgn-4732636.jpg';
@@ -48,7 +49,9 @@ const HomePage = () => {
           <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-start p-12">
             <h1 className="text-5xl font-bold text-red-600 mb-4">Luxury Rides at Your Fingertips</h1>
             <p className="text-xl text-red-600 mb-8">Experience luxury and comfort with our top-of-the-line vehicles</p>
-            <button className="px-8 py-3 bg-red-600 text-white text-lg font-semibold rounded">BOOK NOW</button>
+            <Link to="/vehicles" className="px-8 py-3 bg-red-600 text-white text-lg font-semibold rounded">
+              BOOK NOW
+            </Link>
           </div>
         </section>
 
